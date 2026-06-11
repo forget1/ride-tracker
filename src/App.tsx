@@ -6,7 +6,7 @@ import { RecordForm } from './components/RecordForm';
 import { getRecords, addRecord, updateRecord, deleteRecord, getRecordsByDate, generateId } from './utils/storage';
 import { getToday, parseDate } from './utils/date';
 import type { RideRecord } from './types';
-import './App.css';
+import './styles/app.scss';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(getToday());

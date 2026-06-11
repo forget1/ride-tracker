@@ -1,3 +1,5 @@
+@import './variables.scss';
+
 @import 'vant/lib/index.css';
 
 * {
@@ -13,5 +15,5 @@ html, body, #root {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f5f5f5;
+  background-color: $bg-color;
 }

@@ -79,68 +79,70 @@ export const RecordForm = ({ date, record, onSubmit, onCancel }: RecordFormProps
   const formattedDate = `${parsedDate.getMonth() + 1}月${parsedDate.getDate()}日`;
 
   return (
-    <div className="form-overlay" onClick={onCancel}>
-      <div className="form-modal" onClick={e => e.stopPropagation()}>
-        <div className="form-header">
-          <h3>{record ? '编辑记录' : '添加记录'}</h3>
-          <button className="close-btn" onClick={onCancel}>×</button>
-        </div>
-        <div className="form-body">
-          <div className="form-date">
-            <span>📅</span>
-            <span>{formattedDate}</span>
+    <div className="popup-overlay" onClick={onCancel}>
+      <div className="popup-content" onClick={e => e.stopPropagation()}>
+        <div className="form-modal">
+          <div className="form-header">
+            <h3>{record ? '编辑记录' : '添加记录'}</h3>
+            <button className="close-btn" onClick={onCancel}>×</button>
           </div>
-          <div className="form-group">
-            <label className="form-label">骑行时长（分钟）</label>
-            <input
-              type="number"
-              className="form-input"
-              value={duration}
-              onChange={e => setDuration(e.target.value)}
-              placeholder="输入骑行时长"
-              min="0"
-            />
+          <div className="form-body">
+            <div className="form-date">
+              <span>📅</span>
+              <span>{formattedDate}</span>
+            </div>
+            <div className="form-group">
+              <label className="form-label">骑行时长（分钟）</label>
+              <input
+                type="number"
+                className="form-input"
+                value={duration}
+                onChange={e => setDuration(e.target.value)}
+                placeholder="输入骑行时长"
+                min="0"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">骑行距离（公里）</label>
+              <input
+                type="number"
+                className="form-input"
+                value={distance}
+                onChange={e => setDistance(e.target.value)}
+                placeholder="输入骑行距离"
+                min="0"
+                step="0.1"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">当日花费（元）</label>
+              <input
+                type="number"
+                className="form-input"
+                value={expense}
+                onChange={e => setExpense(e.target.value)}
+                placeholder="输入花费金额"
+                min="0"
+                step="0.01"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">备注</label>
+              <textarea
+                className="form-textarea"
+                value={note}
+                onChange={e => setNote(e.target.value)}
+                placeholder="添加备注（可选）"
+                rows={3}
+              />
+            </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">骑行距离（公里）</label>
-            <input
-              type="number"
-              className="form-input"
-              value={distance}
-              onChange={e => setDistance(e.target.value)}
-              placeholder="输入骑行距离"
-              min="0"
-              step="0.1"
-            />
+          <div className="form-footer">
+            <button className="btn btn-secondary" onClick={onCancel}>取消</button>
+            <button className="btn btn-primary" onClick={handleSubmit}>
+              {record ? '保存' : '添加'}
+            </button>
           </div>
-          <div className="form-group">
-            <label className="form-label">当日花费（元）</label>
-            <input
-              type="number"
-              className="form-input"
-              value={expense}
-              onChange={e => setExpense(e.target.value)}
-              placeholder="输入花费金额"
-              min="0"
-              step="0.01"
-            />
-          </div>
-          <div className="form-group">
-            <label className="form-label">备注</label>
-            <textarea
-              className="form-textarea"
-              value={note}
-              onChange={e => setNote(e.target.value)}
-              placeholder="添加备注（可选）"
-              rows={3}
-            />
-          </div>
-        </div>
-        <div className="form-footer">
-          <button className="btn btn-secondary" onClick={onCancel}>取消</button>
-          <button className="btn btn-primary" onClick={handleSubmit}>
-            {record ? '保存' : '添加'}
-          </button>
         </div>
       </div>
     </div>

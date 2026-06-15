@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { showToast } from 'vant';
+import { useEffect } from 'react';
+import { Form, Input, Button } from 'antd-mobile';
 import type { RideRecord } from '../types';
 import { parseDate } from '../utils/date';
 
@@ -10,60 +10,29 @@ interface RecordFormProps {
   onCancel: () => void;
 }
 
-export const RecordForm = ({ date, record, onSubmit, onCancel }: RecordFormProps) => {
-  const [duration, setDuration] = useState('');
-  const [distance, setDistance] = useState('');
-  const [expense, setExpense] = useState('');
-  const [note, setNote] = useState('');
+const RecordForm = ({ date, record, onSubmit, onCancel }: RecordFormProps) => {
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (record) {
-      setDuration(record.duration.toString());
-      setDistance(record.distance.toString());
-      setExpense(record.expense.toString());
-      setNote(record.note || '');
+      form.setFieldsValue({
+        duration: record.duration.toString(),
+        distance: record.distance.toString(),
+        expense: record.expense.toString(),
+        note: record.note || '',
+      });
     } else {
-      setDuration('');
-      setDistance('');
-      setExpense('');
-      setNote('');
+      form.resetFields();
     }
-  }, [record]);
+  }, [record, form]);
 
-  const handleSubmit = () => {
-    const durationNum = parseInt(duration) || 0;
-    const distanceNum = parseFloat(distance) || 0;
-    const expenseNum = parseFloat(expense) || 0;
+  const handleSubmit = (values: Record<string, any>) => {
+    const durationNum = parseInt(values.duration) || 0;
+    const distanceNum = parseFloat(values.distance) || 0;
+    const expenseNum = parseFloat(values.expense) || 0;
 
     if (durationNum <= 0 && distanceNum <= 0 && expenseNum <= 0) {
-      showToast({
-        message: '请至少填写一项内容',
-        position: 'top',
-      });
-      return;
-    }
-
-    if (durationNum < 0) {
-      showToast({
-        message: '骑行时长不能为负数',
-        position: 'top',
-      });
-      return;
-    }
-
-    if (distanceNum < 0) {
-      showToast({
-        message: '骑行距离不能为负数',
-        position: 'top',
-      });
-      return;
-    }
-
-    if (expenseNum < 0) {
-      showToast({
-        message: '花费金额不能为负数',
-        position: 'top',
-      });
+      form.setFields([{ name: 'duration', errors: ['请至少填写一项内容'] }]);
       return;
     }
 
@@ -71,7 +40,7 @@ export const RecordForm = ({ date, record, onSubmit, onCancel }: RecordFormProps
       duration: durationNum,
       distance: distanceNum,
       expense: expenseNum,
-      note: note || undefined,
+      note: values.note || undefined,
     });
   };
 
@@ -79,72 +48,35 @@ export const RecordForm = ({ date, record, onSubmit, onCancel }: RecordFormProps
   const formattedDate = `${parsedDate.getMonth() + 1}月${parsedDate.getDate()}日`;
 
   return (
-    <div className="popup-overlay" onClick={onCancel}>
-      <div className="popup-content" onClick={e => e.stopPropagation()}>
-        <div className="form-modal">
-          <div className="form-header">
-            <h3>{record ? '编辑记录' : '添加记录'}</h3>
-            <button className="close-btn" onClick={onCancel}>×</button>
-          </div>
-          <div className="form-body">
-            <div className="form-date">
-              <span>📅</span>
-              <span>{formattedDate}</span>
-            </div>
-            <div className="form-group">
-              <label className="form-label">骑行时长（分钟）</label>
-              <input
-                type="number"
-                className="form-input"
-                value={duration}
-                onChange={e => setDuration(e.target.value)}
-                placeholder="输入骑行时长"
-                min="0"
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">骑行距离（公里）</label>
-              <input
-                type="number"
-                className="form-input"
-                value={distance}
-                onChange={e => setDistance(e.target.value)}
-                placeholder="输入骑行距离"
-                min="0"
-                step="0.1"
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">当日花费（元）</label>
-              <input
-                type="number"
-                className="form-input"
-                value={expense}
-                onChange={e => setExpense(e.target.value)}
-                placeholder="输入花费金额"
-                min="0"
-                step="0.01"
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">备注</label>
-              <textarea
-                className="form-textarea"
-                value={note}
-                onChange={e => setNote(e.target.value)}
-                placeholder="添加备注（可选）"
-                rows={3}
-              />
-            </div>
-          </div>
+    <div className="form-content">
+      <div className="form-header"><h3>{record ? '编辑记录' : '添加记录'}</h3></div>
+      <div className="form-body">
+        <div className="form-date"><span>📅</span><span>{formattedDate}</span></div>
+        <Form form={form} onFinish={handleSubmit} layout="vertical">
+          <Form.Item name="duration" label="骑行时长（分钟）" rules={[{ validator: (_, value) => { if (!value) return Promise.resolve(); const num = parseInt(value); if (isNaN(num)) return Promise.reject(new Error('请输入有效的数字')); if (num < 0) return Promise.reject(new Error('骑行时长不能为负数')); if (num > 1440) return Promise.reject(new Error('骑行时长不能超过24小时')); return Promise.resolve(); } }]}>
+            <Input type="number" placeholder="请输入骑行时长" />
+          </Form.Item>
+
+          <Form.Item name="distance" label="骑行距离（公里）" rules={[{ validator: (_, value) => { if (!value) return Promise.resolve(); const num = parseFloat(value); if (isNaN(num)) return Promise.reject(new Error('请输入有效的数字')); if (num < 0) return Promise.reject(new Error('骑行距离不能为负数')); if (num > 1000) return Promise.reject(new Error('骑行距离不能超过1000公里')); return Promise.resolve(); } }]}>
+            <Input type="number" placeholder="请输入骑行距离" step="0.1" />
+          </Form.Item>
+
+          <Form.Item name="expense" label="当日花费（元）" rules={[{ validator: (_, value) => { if (!value) return Promise.resolve(); const num = parseFloat(value); if (isNaN(num)) return Promise.reject(new Error('请输入有效的数字')); if (num < 0) return Promise.reject(new Error('花费金额不能为负数')); if (num > 99999) return Promise.reject(new Error('花费金额不能超过99999元')); return Promise.resolve(); } }]}>
+            <Input type="number" placeholder="请输入花费金额" step="0.01" />
+          </Form.Item>
+
+          <Form.Item name="note" label="备注">
+            <Input placeholder="添加备注（可选）" />
+          </Form.Item>
+
           <div className="form-footer">
-            <button className="btn btn-secondary" onClick={onCancel}>取消</button>
-            <button className="btn btn-primary" onClick={handleSubmit}>
-              {record ? '保存' : '添加'}
-            </button>
+            <Button block onClick={onCancel} className="btn-secondary">取消</Button>
+            <Button color="primary" block onClick={() => form.submit()} className="btn-primary">{record ? '保存' : '添加'}</Button>
           </div>
-        </div>
+        </Form>
       </div>
     </div>
   );
 };
+
+export default RecordForm;

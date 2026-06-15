@@ -11,6 +11,8 @@
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.2.5",
+    "antd-mobile": "^5.42.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "sass": "^1.100.0",

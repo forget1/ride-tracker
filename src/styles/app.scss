@@ -1,498 +1,61 @@
 @import './variables.scss';
 
-.app {
-  min-height: 100vh;
-  background-color: $bg-color;
+.app { min-height: 100vh; background: $bg-color; }
 
-  .app-header {
-    @include primary-gradient;
-    color: white;
-    padding: 20px;
-    text-align: center;
-
-    .app-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .selected-date {
-      @include flex-center;
-      gap: 8px;
-
-      .date-main {
-        font-size: 20px;
-        font-weight: 500;
-      }
-
-      .date-week {
-        font-size: 14px;
-        opacity: 0.9;
-      }
-    }
-  }
-
-  .app-main {
-    padding: 16px;
-  }
+.app-header {
+  padding: 20px; background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+  color: white; text-align: center;
+  .app-title { font-size: 24px; font-weight: bold; margin: 0 0 10px; }
+  .selected-date { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .date-main { font-size: 18px; font-weight: 600; }
+  .date-week { font-size: 14px; opacity: 0.9; }
 }
 
-.calendar {
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: 16px;
-  box-shadow: $shadow-sm;
-  margin-bottom: 16px;
+.app-main { padding: 16px; }
 
-  .calendar-header {
-    @include flex-between;
-    margin-bottom: 16px;
+.calendar-card { margin-bottom: 16px; border-radius: $radius-lg; }
 
-    .nav-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: none;
-      background: #f0f0f0;
-      font-size: 20px;
-      color: $text-primary;
-      @include flex-center;
-      cursor: pointer;
-      transition: background $transition-fast;
+.records-card { border-radius: $radius-lg; }
 
-      &:hover {
-        background: #e0e0e0;
-      }
-    }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.section-header h2 { font-size: 18px; font-weight: 600; margin: 0; color: $text-primary; }
+.add-btn { display: flex; align-items: center; gap: 4px; }
 
-    .month-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: $text-primary;
-    }
-  }
+.empty-state { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; color: $text-secondary; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; color: $primary-color; }
+.empty-state p { margin: 4px 0; font-size: 14px; }
+.empty-hint { font-size: 12px; opacity: 0.7; }
 
-  .weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-    margin-bottom: 8px;
+.summary-card { display: flex; justify-content: space-around; padding: 16px; background: $bg-secondary; border-radius: $radius-md; margin-bottom: 16px; }
+.summary-item { display: flex; flex-direction: column; align-items: center; }
+.summary-value { font-size: 20px; font-weight: bold; color: $primary-color; }
+.summary-label { font-size: 12px; color: $text-secondary; margin-top: 4px; }
 
-    .weekday {
-      text-align: center;
-      font-size: 14px;
-      color: $text-hint;
-      padding: 8px 0;
-    }
-  }
+.records-container { display: flex; flex-direction: column; gap: 12px; }
 
-  .days-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
-  }
+.record-card { padding: 12px; }
 
-  .calendar-day {
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: $radius-sm;
-    cursor: pointer;
-    transition: all $transition-fast;
-    position: relative;
-    font-size: 15px;
-    color: $text-primary;
+.record-content { display: flex; justify-content: space-between; align-items: center; }
+.record-main { display: flex; align-items: center; gap: 12px; }
+.record-icon { font-size: 28px; color: $primary-color; }
+.record-info { display: flex; flex-direction: column; gap: 2px; }
+.record-duration { font-size: 16px; font-weight: 600; color: $text-primary; }
+.record-distance { font-size: 12px; color: $text-secondary; }
+.record-expense { font-size: 18px; font-weight: bold; color: $success-color; }
 
-    &.empty {
-      background: transparent;
-      cursor: default;
-    }
+.record-note { margin-top: 8px; padding-top: 8px; border-top: 1px solid $border-color; font-size: 13px; color: $text-secondary; line-height: 1.4; }
 
-    &:hover:not(.empty) {
-      background: #f0f0f0;
-    }
+.record-actions { display: flex; gap: 8px; margin-top: 12px; }
+.edit-btn, .delete-btn { flex: 1; }
 
-    &.has-record {
-      background: #e8f5e9;
+.form-content { padding: 16px; }
+.form-header { text-align: center; padding-bottom: 16px; border-bottom: 1px solid $border-color; margin-bottom: 16px; }
+.form-header h3 { margin: 0; font-size: 18px; font-weight: 600; color: $text-primary; }
+.form-date { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: $bg-secondary; border-radius: $radius-md; margin-bottom: 16px; font-size: 16px; color: $text-primary; }
 
-      .record-dot {
-        position: absolute;
-        bottom: 4px;
-        width: 6px;
-        height: 6px;
-        background: $primary-color;
-        border-radius: 50%;
-      }
-    }
-
-    &.today {
-      background: $primary-color;
-      color: white;
-
-      &.has-record {
-        background: $primary-color;
-      }
-
-      .record-dot {
-        background: white;
-      }
-    }
-
-    &.selected {
-      background: $secondary-color;
-      color: white;
-
-      &.has-record {
-        background: $secondary-color;
-      }
-
-      .record-dot {
-        background: white;
-      }
-    }
-  }
-}
-
-.records-section {
-  background: $bg-card;
-  border-radius: $radius-md;
-  padding: 16px;
-  box-shadow: $shadow-sm;
-
-  .section-header {
-    @include flex-between;
-    margin-bottom: 16px;
-
-    h2 {
-      font-size: 16px;
-      font-weight: 600;
-      color: $text-primary;
-    }
-
-    .add-btn {
-      @include primary-gradient;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity $transition-fast;
-
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-  }
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: $text-hint;
-
-  .empty-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-  }
-
-  p {
-    margin: 4px 0;
-  }
-
-  .empty-hint {
-    font-size: 14px;
-    opacity: 0.7;
-  }
-}
-
-.record-list {
-  .summary-card {
-    display: flex;
-    justify-content: space-around;
-    background: linear-gradient(135deg, $bg-color 0%, #eeeeee 100%);
-    border-radius: $radius-md;
-    padding: 16px;
-    margin-bottom: 16px;
-
-    .summary-item {
-      text-align: center;
-
-      .summary-value {
-        display: block;
-        font-size: 18px;
-        font-weight: 600;
-        color: $text-primary;
-      }
-
-      .summary-label {
-        font-size: 12px;
-        color: $text-hint;
-      }
-    }
-  }
-
-  .records-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-}
-
-.record-card {
-  background: #fafafa;
-  border-radius: $radius-md;
-  padding: 12px;
-
-  .record-content {
-    @include flex-between;
-
-    .record-main {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-
-      .record-icon {
-        font-size: 28px;
-      }
-
-      .record-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-
-        .record-duration {
-          font-size: 16px;
-          font-weight: 600;
-          color: $text-primary;
-        }
-
-        .record-distance {
-          font-size: 14px;
-          color: $text-secondary;
-        }
-      }
-    }
-
-    .record-expense {
-      font-size: 18px;
-      font-weight: 600;
-      color: $danger-color;
-    }
-  }
-
-  .record-note {
-    margin-top: 8px;
-    font-size: 14px;
-    color: $text-hint;
-    padding-top: 8px;
-    border-top: 1px solid $border-light;
-  }
-
-  .record-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 12px;
-
-    .action-btn {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      border-radius: $radius-sm;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity $transition-fast;
-    }
-
-    .edit-btn {
-      background: $secondary-color;
-      color: white;
-
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-
-    .delete-btn {
-      background: #f0f0f0;
-      color: $text-secondary;
-
-      &:hover {
-        background: #e0e0e0;
-      }
-    }
-  }
-}
-
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: flex-end;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
-}
-
-.popup-content {
-  width: 100%;
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-.form-modal {
-  background: $bg-card;
-  border-radius: $radius-xl $radius-xl 0 0;
-  max-height: 80vh;
-  overflow-y: auto;
-
-  .form-header {
-    @include flex-between;
-    padding: 20px;
-    border-bottom: 1px solid $border-light;
-
-    h3 {
-      font-size: 18px;
-      font-weight: 600;
-      color: $text-primary;
-    }
-
-    .close-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: #f0f0f0;
-      font-size: 20px;
-      color: $text-secondary;
-      @include flex-center;
-      cursor: pointer;
-    }
-  }
-
-  .form-body {
-    padding: 20px;
-
-    .form-date {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 16px;
-      color: $text-primary;
-      margin-bottom: 20px;
-      padding: 12px;
-      background: $bg-color;
-      border-radius: $radius-sm;
-    }
-  }
-
-  .form-group {
-    margin-bottom: 16px;
-
-    .form-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 500;
-      color: $text-primary;
-      margin-bottom: 8px;
-    }
-
-    .form-input,
-    .form-textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid $border-color;
-      border-radius: $radius-sm;
-      font-size: 16px;
-      transition: border-color $transition-fast;
-
-      &:focus {
-        outline: none;
-        border-color: $primary-color;
-      }
-    }
-
-    .form-textarea {
-      resize: none;
-    }
-
-    .form-error {
-      color: $danger-color;
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .form-input.error,
-    .form-textarea.error {
-      border-color: $danger-color;
-    }
-  }
-
-  .form-footer {
-    display: flex;
-    gap: 12px;
-    padding: 20px;
-    border-top: 1px solid $border-light;
-
-    .btn {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: $radius-sm;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity $transition-fast;
-    }
-
-    .btn-secondary {
-      background: #f0f0f0;
-      color: $text-secondary;
-
-      &:hover {
-        background: #e0e0e0;
-      }
-    }
-
-    .btn-primary {
-      @include primary-gradient;
-      color: white;
-
-      &:hover {
-        opacity: 0.9;
-      }
-    }
-  }
-}
+.form-footer { display: flex; gap: 12px; margin-top: 20px; }
+.btn-secondary, .btn-primary { flex: 1; height: 44px; }
 
 @media (min-width: 768px) {
-  .app {
-    max-width: 480px;
-    margin: 0 auto;
-    box-shadow: $shadow-md;
-  }
+  .app { max-width: 480px; margin: 0 auto; box-shadow: $shadow-md; min-height: 100vh; }
 }

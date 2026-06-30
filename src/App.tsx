@@ -1,35 +1,23 @@
-import { useState, useEffect } from 'react';
 import { Calendar, Card, Button, Popup, Toast, Modal } from 'antd-mobile';
-import { addRecord, updateRecord, deleteRecord, getRecordsByDate, generateId } from './utils/storage';
-import { getToday, formatDuration, formatDistance, formatExpense } from './utils/date';
+import { useAppState, useAppDispatch } from './store/context';
+import { selectRecordsByDate, selectTotals } from './store/selectors';
+import { generateId } from './utils/storage';
+import { formatDuration, formatDistance, formatExpense } from './utils/date';
 import type { RideRecord } from './types';
 import RecordForm from './components/RecordForm';
 import './styles/app.scss';
 
 function App() {
-  const [currentDate, setCurrentDate] = useState(getToday());
-  const [selectedRecords, setSelectedRecords] = useState<RideRecord[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingRecord, setEditingRecord] = useState<RideRecord | null>(null);
+  const { currentDate, records, showForm, editingRecord } = useAppState();
+  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    setSelectedRecords(getRecordsByDate(currentDate));
-  }, [currentDate]);
+  const selectedRecords = selectRecordsByDate(records, currentDate);
+  const totals = selectTotals(records, currentDate);
 
   const handleDateSelect = (date: Date | null) => {
     if (date) {
-      setCurrentDate(date.toISOString().split('T')[0]);
+      dispatch({ type: 'SET_DATE', payload: date.toISOString().split('T')[0] });
     }
-  };
-
-  const handleAddRecord = () => {
-    setEditingRecord(null);
-    setShowForm(true);
-  };
-
-  const handleEditRecord = (record: RideRecord) => {
-    setEditingRecord(record);
-    setShowForm(true);
   };
 
   const handleDeleteRecord = (id: string) => {
@@ -38,8 +26,7 @@ function App() {
       confirmText: '确定',
       cancelText: '取消',
       onConfirm: () => {
-        deleteRecord(id);
-        setSelectedRecords(getRecordsByDate(currentDate));
+        dispatch({ type: 'DELETE_RECORD', payload: id });
         Toast.show('删除成功');
       },
     });
@@ -47,20 +34,14 @@ function App() {
 
   const handleFormSubmit = (data: Omit<RideRecord, 'id' | 'date'>) => {
     if (editingRecord) {
-      updateRecord(editingRecord.id, data);
+      dispatch({ type: 'UPDATE_RECORD', payload: { id: editingRecord.id, data } });
       Toast.show('保存成功');
     } else {
-      addRecord({ ...data, id: generateId(), date: currentDate });
+      dispatch({ type: 'ADD_RECORD', payload: { ...data, id: generateId(), date: currentDate } });
       Toast.show('添加成功');
     }
-    setSelectedRecords(getRecordsByDate(currentDate));
-    setShowForm(false);
-    setEditingRecord(null);
+    dispatch({ type: 'CLOSE_FORM' });
   };
-
-  const totalDuration = selectedRecords.reduce((sum, r) => sum + r.duration, 0);
-  const totalDistance = selectedRecords.reduce((sum, r) => sum + r.distance, 0);
-  const totalExpense = selectedRecords.reduce((sum, r) => sum + r.expense, 0);
 
   return (
     <div className="app">
@@ -80,7 +61,7 @@ function App() {
         <Card className="records-card">
           <div className="section-header">
             <h2>当日记录</h2>
-            <Button color="primary" size="small" onClick={handleAddRecord} className="add-btn">+ 添加记录</Button>
+            <Button color="primary" size="small" onClick={() => dispatch({ type: 'OPEN_FORM' })} className="add-btn">+ 添加记录</Button>
           </div>
 
           {selectedRecords.length === 0 ? (
@@ -92,9 +73,9 @@ function App() {
           ) : (
             <>
               <div className="summary-card">
-                <div className="summary-item"><span className="summary-value">{formatDuration(totalDuration)}</span><span className="summary-label">总时长</span></div>
-                <div className="summary-item"><span className="summary-value">{formatDistance(totalDistance)}</span><span className="summary-label">总距离</span></div>
-                <div className="summary-item"><span className="summary-value">{formatExpense(totalExpense)}</span><span className="summary-label">总花费</span></div>
+                <div className="summary-item"><span className="summary-value">{formatDuration(totals.duration)}</span><span className="summary-label">总时长</span></div>
+                <div className="summary-item"><span className="summary-value">{formatDistance(totals.distance)}</span><span className="summary-label">总距离</span></div>
+                <div className="summary-item"><span className="summary-value">{formatExpense(totals.expense)}</span><span className="summary-label">总花费</span></div>
               </div>
 
               <div className="records-container">
@@ -112,7 +93,7 @@ function App() {
                     </div>
                     {record.note && <div className="record-note">{record.note}</div>}
                     <div className="record-actions">
-                      <Button color="primary" size="small" onClick={() => handleEditRecord(record)} className="edit-btn">编辑</Button>
+                      <Button color="primary" size="small" onClick={() => dispatch({ type: 'OPEN_FORM', payload: record })} className="edit-btn">编辑</Button>
                       <Button size="small" onClick={() => handleDeleteRecord(record.id)} className="delete-btn">删除</Button>
                     </div>
                   </Card>
@@ -123,8 +104,8 @@ function App() {
         </Card>
       </main>
 
-      <Popup visible={showForm} position="bottom" onClose={() => { setShowForm(false); setEditingRecord(null); }}>
-        <RecordForm date={currentDate} record={editingRecord} onSubmit={handleFormSubmit} onCancel={() => { setShowForm(false); setEditingRecord(null); }} />
+      <Popup visible={showForm} position="bottom" onClose={() => dispatch({ type: 'CLOSE_FORM' })}>
+        <RecordForm date={currentDate} record={editingRecord} onSubmit={handleFormSubmit} onCancel={() => dispatch({ type: 'CLOSE_FORM' })} />
       </Popup>
     </div>
   );
